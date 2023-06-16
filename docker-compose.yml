@@ -1,0 +1,47 @@
+version: '3'
+services:
+  # db:
+  #   image: postgres:latest
+  #   environment:
+  #     POSTGRES_USER: kayo
+  #     POSTGRES_PASSWORD: 122436
+  #   volumes:
+  #     - postgres-data:/var/lib/postgresql/data
+  #     # - /home/kayo/code/KayoPereira/docker_on_rails/tmp/db:/var/lib/postgresql/data
+  postgres:
+    mem_limit: ${POSTGRES_CONTAINER_RAM_LIMIT:-0}
+    image: postgres:15
+    environment:
+      POSTGRES_USER: kayo
+      POSTGRES_PASSWORD: 122436
+    ports:
+      - '5433:5432'
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - .:/app
+    profiles: ["dev"]
+    env_file:
+      - .env
+  web:
+    build:
+      context: .
+      args:
+        BUNDLE_WITHOUT: ''
+    command: bundle exec rails s -p 3000 -b '0.0.0.0'
+    volumes:
+      - .:/app
+      - gem_cache:/vendor/bundle/gems
+    links:
+      - postgres
+    ports:
+      - "3000:3000"
+    environment:
+      - DATABASE_URL=postgresql://kayo:122436@postgres:5432/kayo?encoding=utf8&pool=5&timeout=5000
+    depends_on:
+      - postgres
+    env_file:
+      - .env
+volumes:
+  postgres-data:
+  gem_cache:
+

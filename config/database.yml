@@ -24,7 +24,11 @@ default: &default
 development:
   <<: *default
   database: docker_on_rails_development
-
+  host: localhost
+  username: <%= ENV['DOCKER_ON_RAILS_DATABASE_USERNAME'] %>
+  password: <%= ENV['DOCKER_ON_RAILS_DATABASE_PASSWORD'] %>
+  port: 5432
+  template: template0
   # The specified database role being used to connect to postgres.
   # To create additional roles in postgres see `$ createuser --help`.
   # When left blank, postgres will use the default role. This is
